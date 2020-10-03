@@ -12,6 +12,7 @@ GITHUB_ACCESS_TOKEN = os.environ['GITHUB_ACCESS_TOKEN']
 GITHUB_REF = os.environ['GITHUB_REF']
 GITHUB_REPOSITORY = os.environ['GITHUB_REPOSITORY']
 GITHUB_ACTOR = os.environ['GITHUB_ACTOR']
+LABEL = os.environ['LABEL'] if "LABEL" in os.environ else ""
 
 
 def main():
@@ -29,8 +30,8 @@ def create_pull_request(repo, template_content, issue):
                           base=repo.default_branch)
     for label in issue.labels:
         pr.add_to_labels(label.name)
-    if any(label.name == "WIP" for label in repo.get_labels()):
-        pr.add_to_labels("WIP")
+    if any(label.name == LABEL for label in repo.get_labels()):
+        pr.add_to_labels(LABEL)
     pr.add_to_assignees(GITHUB_ACTOR)
 
 
@@ -56,9 +57,17 @@ def get_issue(repo, id):
 
 
 def get_template_content(repo, issue):
-    contents = repo.get_contents(".github/pull_request_template.md")
-    contents = base64.b64decode(contents.content).decode('utf8', 'ignore')
-    return contents.format(issue_number=issue.number, title=issue.title)
+    try:
+        contents = repo.get_contents(".github/pull_request_template.md")
+        contents = base64.b64decode(contents.content).decode('utf8', 'ignore')
+        if '{submit_pull_request_issue_info}' in contents:
+            issue_info = "refs #{issue_number} {title}\n".format(
+                issue_number=issue.number, title=issue.title)
+            return contents.format(submit_pull_request_issue_info=issue_info)
+        else:
+            return contents
+    except:
+        return ''
 
 
 if __name__ == '__main__':
