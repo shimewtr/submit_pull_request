@@ -1,0 +1,15 @@
+name: 'Submit Pull Request'
+description: 'Submit a pull request associated with the issue'
+inputs:
+  GITHUB_ACCESS_TOKEN:
+    description: 'GITHUB_TOKEN or a `repo` scoped Personal Access Token'
+    required: true
+  LABEL:
+    description: 'Label to be given to the submitted pull request'
+    required: false
+runs:
+  using: "docker"
+  image: "Dockerfile"
+branding:
+  icon: 'git-pull-request'
+  color: 'orange'
