@@ -7,6 +7,10 @@ inputs:
   LABEL:
     description: 'Label to be given to the submitted pull request'
     required: false
+  ASSIGN:
+    description: 'Choose to assign the committed user'
+    default: true
+    required: false
 runs:
   using: "docker"
   image: "Dockerfile"

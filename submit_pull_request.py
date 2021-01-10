@@ -13,7 +13,7 @@ GITHUB_REF = os.environ['GITHUB_REF']
 GITHUB_REPOSITORY = os.environ['GITHUB_REPOSITORY']
 GITHUB_ACTOR = os.environ['GITHUB_ACTOR']
 LABEL = os.environ['LABEL'] if "LABEL" in os.environ else ""
-
+ASSIGN = os.environ['ASSIGN'].lower() == "true" if "ASSIGN" in os.environ else True
 
 class SubmitPullRequest():
     def __init__(self):
@@ -23,7 +23,8 @@ class SubmitPullRequest():
         self.pr_body = self.build_pr_body()
         self.pr = self.create_pull_request()
         self.add_label_to_pull_request()
-        self.add_assignees_to_pull_request()
+        if ASSIGN:
+            self.add_assignees_to_pull_request()
 
     def add_assignees_to_pull_request(self):
         try:
