@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Submit Pul Request
-        uses: shimewtr/submit_pull_request@v0.1.0
+        uses: shimewtr/submit_pull_request@master
         env:
           GITHUB_ACCESS_TOKEN: ${{secrets.github_token}}
           LABEL: WIP
