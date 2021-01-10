@@ -1,5 +1,7 @@
 # Submit Pull Request
 
+![eye_catch](./.github/img/eye_catch.png)
+
 This is a GitHub Actions that will automatically submit a pull request.
 
 ## Functions
