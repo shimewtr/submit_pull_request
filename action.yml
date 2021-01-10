@@ -5,7 +5,7 @@ inputs:
     description: 'GITHUB_TOKEN or a `repo` scoped Personal Access Token'
     required: true
   LABEL:
-    description: 'Label to be given to the submitted pull request comma separated labels ex.) "bugfix,feature,new_commer"'
+    description: 'Comma separated label names to label the submitted pull request ex.) "bugfix,feature,new_commer"'
     required: false
   ASSIGN:
     description: 'Choose to assign the committed user'
