@@ -15,60 +15,91 @@ GITHUB_ACTOR = os.environ['GITHUB_ACTOR']
 LABEL = os.environ['LABEL'] if "LABEL" in os.environ else ""
 
 
-def main():
-    branch_id = get_branch_id()
-    repo = Github(GITHUB_ACCESS_TOKEN).get_repo(GITHUB_REPOSITORY)
-    issue = get_issue(repo, branch_id)
-    template_content = get_template_content(repo, issue)
-    create_pull_request(repo, template_content, issue)
+class SubmitPullRequest():
+    def __init__(self):
+        self.branch_id = self.parse_branch_name()
+        self.repo = Github(GITHUB_ACCESS_TOKEN).get_repo(GITHUB_REPOSITORY)
+        self.issue = self.get_issue()
+        self.pr_body = self.build_pr_body()
+        self.pr = self.create_pull_request()
+        self.add_label_to_pull_request()
+        self.add_assignees_to_pull_request()
 
+    def add_assignees_to_pull_request(self):
+        try:
+            self.pr.add_to_assignees(GITHUB_ACTOR)
+        except:
+            self.error_handler("Failed to add assignees to pull request")
 
-def create_pull_request(repo, template_content, issue):
-    pr = repo.create_pull(title="refs #{id} {issue_title}".format(id=issue.number, issue_title=issue.title),
-                          body=template_content,
-                          head=GITHUB_REF,
-                          base=repo.default_branch)
-    for label in issue.labels:
-        pr.add_to_labels(label.name)
-    if any(label.name == LABEL for label in repo.get_labels()):
-        pr.add_to_labels(LABEL)
-    pr.add_to_assignees(GITHUB_ACTOR)
+    def add_label_to_pull_request(self):
+        try:
+            for label in self.issue.labels:
+                self.pr.add_to_labels(label.name)
+            if LABEL:
+                if any(label.name == LABEL for label in self.repo.get_labels()):
+                    self.pr.add_to_labels(LABEL)
+        except:
+            self.error_handler("Failed to add label to pull request")
 
+    def build_pr_body(self):
+        template_content = self.get_template_content()
+        return self.replace_tag_to_issue_information(template_content)
 
-def error_handler(message):
-    print(message)
-    sys.exit()
+    def create_pull_request(self):
+        try:
+            issue_number = self.issue.number
+            title = self.issue.title
+            pr_title = "refs #{} {}".format(issue_number, title)
+            pr = self.repo.create_pull(
+                title=pr_title,
+                body=self.pr_body,
+                head=GITHUB_REF,
+                base=self.repo.default_branch)
+            return pr
+        except:
+            self.error_handler("Failed to create pull request")
 
+    def error_handler(self, message):
+        print('\033[31m' + message + '\033[0m')
+        raise Exception
 
-def get_branch_id():
-    m = re.findall(r'/\d+', GITHUB_REF)
-    if m:
-        return int(m[-1][1:])
-    else:
-        error_handler("Branch name is incorrect")
-
-
-def get_issue(repo, id):
-    issue = repo.get_issue(id)
-    if issue:
-        return issue
-    else:
-        error_handler("No corresponding issue")
-
-
-def get_template_content(repo, issue):
-    try:
-        contents = repo.get_contents(".github/pull_request_template.md")
-        contents = base64.b64decode(contents.content).decode('utf8', 'ignore')
-        if '{submit_pull_request_issue_info}' in contents:
-            issue_info = "refs #{issue_number} {title}\n".format(
-                issue_number=issue.number, title=issue.title)
-            return contents.format(submit_pull_request_issue_info=issue_info)
+    def get_issue(self):
+        try:
+            issue = self.repo.get_issue(self.branch_id)
+        except:
+            self.error_handler("Failed to get the issue")
+        if issue:
+            return issue
         else:
+            self.error_handler("No corresponding issue")
+
+    def get_template_content(self):
+        try:
+            contents = self.repo.get_contents(
+                ".github/pull_request_template.md")
+            contents = base64.b64decode(
+                contents.content).decode('utf8', 'ignore')
             return contents
-    except:
-        return ''
+        except:
+            return ''
+
+    def parse_branch_name(self):
+        m = re.findall(r'/\d+', GITHUB_REF)
+        try:
+            branch_id = int(m[-1][1:])
+            return branch_id
+        except:
+            self.error_handler("Branch name is incorrect")
+
+    def replace_tag_to_issue_information(self, content):
+        if '{submit_pull_request_issue_info}' in content:
+            issue_number = self.issue.number
+            title = self.issue.title
+            issue_info = "refs #{} {}\n".format(issue_number, title)
+            return content.format(submit_pull_request_issue_info=issue_info)
+        else:
+            return content
 
 
 if __name__ == '__main__':
-    main()
+    SubmitPullRequest()
