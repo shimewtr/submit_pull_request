@@ -60,7 +60,7 @@ class SubmitPullRequest():
             self.error_handler("Failed to create pull request")
 
     def error_handler(self, message):
-        print(message)
+        print('\033[31m' + message + '\033[0m')
         raise Exception
 
     def get_issue(self):
