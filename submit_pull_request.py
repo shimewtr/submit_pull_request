@@ -12,7 +12,7 @@ GITHUB_ACCESS_TOKEN = os.environ['GITHUB_ACCESS_TOKEN']
 GITHUB_REF = os.environ['GITHUB_REF']
 GITHUB_REPOSITORY = os.environ['GITHUB_REPOSITORY']
 GITHUB_ACTOR = os.environ['GITHUB_ACTOR']
-LABEL = os.environ['LABEL'] if "LABEL" in os.environ else ""
+LABEL = [x.strip() for x in os.environ['LABEL'].split(',')] if "LABEL" in os.environ else []
 ASSIGN = os.environ['ASSIGN'].lower() == "true" if "ASSIGN" in os.environ else True
 LABEL_SAME_AS_ISSUE = os.environ['LABEL_SAME_AS_ISSUE'].lower() == "true" if "LABEL_SAME_AS_ISSUE" in os.environ else True
 
@@ -38,9 +38,8 @@ class SubmitPullRequest():
             if LABEL_SAME_AS_ISSUE:
                 for label in self.issue.labels:
                     self.pr.add_to_labels(label.name)
-            if LABEL:
-                if any(label.name == LABEL for label in self.repo.get_labels()):
-                    self.pr.add_to_labels(LABEL)
+            for label in (set(LABEL) & set([x.name for x in self.repo.get_labels()])):
+                self.pr.add_to_labels(label)
         except:
             self.error_handler("Failed to add label to pull request")
 
