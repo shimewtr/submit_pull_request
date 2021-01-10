@@ -14,6 +14,7 @@ GITHUB_REPOSITORY = os.environ['GITHUB_REPOSITORY']
 GITHUB_ACTOR = os.environ['GITHUB_ACTOR']
 LABEL = os.environ['LABEL'] if "LABEL" in os.environ else ""
 ASSIGN = os.environ['ASSIGN'].lower() == "true" if "ASSIGN" in os.environ else True
+LABEL_SAME_AS_ISSUE = os.environ['LABEL_SAME_AS_ISSUE'].lower() == "true" if "LABEL_SAME_AS_ISSUE" in os.environ else True
 
 class SubmitPullRequest():
     def __init__(self):
@@ -34,8 +35,9 @@ class SubmitPullRequest():
 
     def add_label_to_pull_request(self):
         try:
-            for label in self.issue.labels:
-                self.pr.add_to_labels(label.name)
+            if LABEL_SAME_AS_ISSUE:
+                for label in self.issue.labels:
+                    self.pr.add_to_labels(label.name)
             if LABEL:
                 if any(label.name == LABEL for label in self.repo.get_labels()):
                     self.pr.add_to_labels(LABEL)
