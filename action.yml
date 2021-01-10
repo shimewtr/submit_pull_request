@@ -11,6 +11,10 @@ inputs:
     description: 'Choose to assign the committed user'
     default: true
     required: false
+  LABEL_SAME_AS_ISSUE:
+    description: 'Choose to label to pr same as issue'
+    default: true
+    required: false
 runs:
   using: "docker"
   image: "Dockerfile"
