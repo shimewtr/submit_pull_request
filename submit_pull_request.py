@@ -51,7 +51,7 @@ class SubmitPullRequest():
         try:
             issue_number = self.issue.number
             title = self.issue.title
-            pr_title = "refs #{} {}".format(issue_number, title)
+            pr_title = "ref #{} {}".format(issue_number, title)
             pr = self.repo.create_pull(
                 title=pr_title,
                 body=self.pr_body,
@@ -97,7 +97,7 @@ class SubmitPullRequest():
         if '{submit_pull_request_issue_info}' in content:
             issue_number = self.issue.number
             title = self.issue.title
-            issue_info = "refs #{} {}\n".format(issue_number, title)
+            issue_info = "ref #{} {}\n".format(issue_number, title)
             return content.format(submit_pull_request_issue_info=issue_info)
         else:
             return content
