@@ -12,9 +12,11 @@ GITHUB_ACCESS_TOKEN = os.environ['GITHUB_ACCESS_TOKEN']
 GITHUB_REF = os.environ['GITHUB_REF']
 GITHUB_REPOSITORY = os.environ['GITHUB_REPOSITORY']
 GITHUB_ACTOR = os.environ['GITHUB_ACTOR']
+DRAFT = True if os.environ['DRAFT'].lower() == "true" else False
 LABEL = [x.strip() for x in os.environ['LABEL'].split(',')] if "LABEL" in os.environ else []
 ASSIGN = os.environ['ASSIGN'].lower() == "true" if "ASSIGN" in os.environ else True
 LABEL_SAME_AS_ISSUE = os.environ['LABEL_SAME_AS_ISSUE'].lower() == "true" if "LABEL_SAME_AS_ISSUE" in os.environ else True
+DEBUG = True if os.environ['DEBUG'].lower() == "true" else False
 
 class SubmitPullRequest():
     def __init__(self):
@@ -56,7 +58,8 @@ class SubmitPullRequest():
                 title=pr_title,
                 body=self.pr_body,
                 head=GITHUB_REF,
-                base=self.repo.default_branch)
+                base=self.repo.default_branch,
+                draft=DRAFT)
             return pr
         except:
             self.error_handler("Failed to create pull request")
@@ -69,7 +72,10 @@ class SubmitPullRequest():
         try:
             issue = self.repo.get_issue(self.branch_id)
         except:
-            self.error_handler("Failed to get the issue")
+            if DEBUG:
+                issue = IssueMock()
+            else:
+                self.error_handler("Failed to get the issue")
         if issue:
             return issue
         else:
@@ -102,6 +108,10 @@ class SubmitPullRequest():
         else:
             return content
 
+class IssueMock:
+    number = 0
+    title = 'temporary title'
+    labels = []
 
 if __name__ == '__main__':
     SubmitPullRequest()
