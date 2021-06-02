@@ -12,11 +12,13 @@ GITHUB_ACCESS_TOKEN = os.environ['GITHUB_ACCESS_TOKEN']
 GITHUB_REF = os.environ['GITHUB_REF']
 GITHUB_REPOSITORY = os.environ['GITHUB_REPOSITORY']
 GITHUB_ACTOR = os.environ['GITHUB_ACTOR']
-DRAFT = True if os.environ['DRAFT'].lower() == "true" else False
+DRAFT = os.environ['DRAFT'].lower() == "true" if "DRAFT" in os.environ else False
 LABEL = [x.strip() for x in os.environ['LABEL'].split(',')] if "LABEL" in os.environ else []
 ASSIGN = os.environ['ASSIGN'].lower() == "true" if "ASSIGN" in os.environ else True
-LABEL_SAME_AS_ISSUE = os.environ['LABEL_SAME_AS_ISSUE'].lower() == "true" if "LABEL_SAME_AS_ISSUE" in os.environ else True
-DEBUG = True if os.environ['DEBUG'].lower() == "true" else False
+LABEL_SAME_AS_ISSUE = os.environ['LABEL_SAME_AS_ISSUE'].lower(
+) == "true" if "LABEL_SAME_AS_ISSUE" in os.environ else True
+DEBUG = os.environ['DEBUG'].lower() == "true" if "DRAFT" in os.environ else False
+
 
 class SubmitPullRequest():
     def __init__(self):
@@ -108,10 +110,12 @@ class SubmitPullRequest():
         else:
             return content
 
+
 class IssueMock:
     number = 0
     title = 'temporary title'
     labels = []
+
 
 if __name__ == '__main__':
     SubmitPullRequest()
