@@ -12,3 +12,5 @@ jobs:
         env:
           GITHUB_ACCESS_TOKEN: ${{secrets.github_token}}
           LABEL: WIP
+          DRAFT: true
+          DEBUG: true
