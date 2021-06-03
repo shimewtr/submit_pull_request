@@ -7,7 +7,7 @@ jobs:
   SubmitPullRequest:
     runs-on: ubuntu-latest
     steps:
-      - name: Submit Pul Request
+      - name: Submit Pull Request
         uses: shimewtr/submit_pull_request@master
         env:
           GITHUB_ACCESS_TOKEN: ${{secrets.github_token}}
