@@ -1,23 +1,19 @@
 import base64
-import json
 import os
 import re
-import requests
-import sys
-import textwrap
-import urllib
 from github import Github
 
 GITHUB_ACCESS_TOKEN = os.environ['GITHUB_ACCESS_TOKEN']
 GITHUB_REF = os.environ['GITHUB_REF']
 GITHUB_REPOSITORY = os.environ['GITHUB_REPOSITORY']
 GITHUB_ACTOR = os.environ['GITHUB_ACTOR']
+
+ASSIGN = os.environ['ASSIGN'].lower() == "true" if "ASSIGN" in os.environ else True
+DEBUG = os.environ['DEBUG'].lower() == "true" if "DEBUG" in os.environ else False
 DRAFT = os.environ['DRAFT'].lower() == "true" if "DRAFT" in os.environ else False
 LABEL = [x.strip() for x in os.environ['LABEL'].split(',')] if "LABEL" in os.environ else []
-ASSIGN = os.environ['ASSIGN'].lower() == "true" if "ASSIGN" in os.environ else True
-LABEL_SAME_AS_ISSUE = os.environ['LABEL_SAME_AS_ISSUE'].lower(
-) == "true" if "LABEL_SAME_AS_ISSUE" in os.environ else True
-DEBUG = os.environ['DEBUG'].lower() == "true" if "DRAFT" in os.environ else False
+LABEL_SAME_AS_ISSUE = os.environ['LABEL_SAME_AS_ISSUE'].lower() == "true" if "LABEL_SAME_AS_ISSUE" in os.environ else True
+TEMPLATE_FILE_PATH = os.environ['TEMPLATE_FILE_PATH'] if "TEMPLATE_FILE_PATH" in os.environ else ".github/pull_request_template.md"
 
 
 class SubmitPullRequest():
@@ -85,10 +81,8 @@ class SubmitPullRequest():
 
     def get_template_content(self):
         try:
-            contents = self.repo.get_contents(
-                ".github/pull_request_template.md")
-            contents = base64.b64decode(
-                contents.content).decode('utf8', 'ignore')
+            contents = self.repo.get_contents(TEMPLATE_FILE_PATH)
+            contents = base64.b64decode(contents.content).decode('utf8', 'ignore')
             return contents
         except:
             return ''
