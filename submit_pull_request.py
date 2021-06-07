@@ -117,12 +117,9 @@ class SubmitPullRequest():
     def get_access_token(self):
         try:
             authors_json = json.loads(AUTHORS)
-            for author in authors_json.get("authors"):
-                if author.get("name") == GITHUB_ACTOR:
-                    return author.get("token")
+            return authors_json[GITHUB_ACTOR] if GITHUB_ACTOR in authors_json else GITHUB_ACCESS_TOKEN
         except:
-            pass
-        return GITHUB_ACCESS_TOKEN
+            return GITHUB_ACCESS_TOKEN
 
 class IssueMock:
     number = 0
