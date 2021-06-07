@@ -1,6 +1,7 @@
 import base64
 import os
 import re
+import json
 from github import Github
 
 GITHUB_ACCESS_TOKEN = os.environ['GITHUB_ACCESS_TOKEN']
@@ -15,12 +16,12 @@ LABEL = [x.strip() for x in os.environ['LABEL'].split(',')] if "LABEL" in os.env
 LABEL_SAME_AS_ISSUE = os.environ['LABEL_SAME_AS_ISSUE'].lower() == "true" if "LABEL_SAME_AS_ISSUE" in os.environ else True
 MILESTONE_SAME_AS_ISSUE = os.environ['MILESTONE_SAME_AS_ISSUE'].lower() == "true" if "MILESTONE_SAME_AS_ISSUE" in os.environ else True
 TEMPLATE_FILE_PATH = os.environ['TEMPLATE_FILE_PATH'] if "TEMPLATE_FILE_PATH" in os.environ else ".github/pull_request_template.md"
-
+AUTHORS = os.environ['AUTHORS'] if "AUTHORS" in os.environ else "{}"
 
 class SubmitPullRequest():
     def __init__(self):
         self.branch_id = self.parse_branch_name()
-        self.repo = Github(GITHUB_ACCESS_TOKEN).get_repo(GITHUB_REPOSITORY)
+        self.repo = Github(self.get_access_token()).get_repo(GITHUB_REPOSITORY)
         self.issue = self.get_issue()
         self.pr_body = self.build_pr_body()
         self.pr = self.create_pull_request()
@@ -113,11 +114,18 @@ class SubmitPullRequest():
         else:
             return content
 
+    def get_access_token(self):
+        try:
+            authors_json = json.loads(AUTHORS)
+            return authors_json[GITHUB_ACTOR] if GITHUB_ACTOR in authors_json else GITHUB_ACCESS_TOKEN
+        except:
+            return GITHUB_ACCESS_TOKEN
 
 class IssueMock:
     number = 0
     title = 'temporary title'
     labels = []
+    milestone = ''
 
 
 if __name__ == '__main__':
