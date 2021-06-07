@@ -16,7 +16,7 @@ LABEL = [x.strip() for x in os.environ['LABEL'].split(',')] if "LABEL" in os.env
 LABEL_SAME_AS_ISSUE = os.environ['LABEL_SAME_AS_ISSUE'].lower() == "true" if "LABEL_SAME_AS_ISSUE" in os.environ else True
 MILESTONE_SAME_AS_ISSUE = os.environ['MILESTONE_SAME_AS_ISSUE'].lower() == "true" if "MILESTONE_SAME_AS_ISSUE" in os.environ else True
 TEMPLATE_FILE_PATH = os.environ['TEMPLATE_FILE_PATH'] if "TEMPLATE_FILE_PATH" in os.environ else ".github/pull_request_template.md"
-AUTHORS = os.environ['AUTHORS']
+AUTHORS = os.environ['AUTHORS'] if "AUTHORS" in os.environ else "{}"
 
 class SubmitPullRequest():
     def __init__(self):
