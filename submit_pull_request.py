@@ -17,6 +17,7 @@ LABEL_SAME_AS_ISSUE = os.environ['LABEL_SAME_AS_ISSUE'].lower() == "true" if "LA
 MILESTONE_SAME_AS_ISSUE = os.environ['MILESTONE_SAME_AS_ISSUE'].lower() == "true" if "MILESTONE_SAME_AS_ISSUE" in os.environ else True
 TEMPLATE_FILE_PATH = os.environ['TEMPLATE_FILE_PATH'] if "TEMPLATE_FILE_PATH" in os.environ else ".github/pull_request_template.md"
 AUTHORS = os.environ['AUTHORS'] if "AUTHORS" in os.environ else "{}"
+CAN_BOT_MAKE_PR = os.environ['CAN_BOT_MAKE_PR'].lower() == "true" if "CAN_BOT_MAKE_PR" in os.environ else True
 
 class SubmitPullRequest():
     def __init__(self):
@@ -119,7 +120,11 @@ class SubmitPullRequest():
             authors_json = json.loads(AUTHORS)
             return authors_json[GITHUB_ACTOR] if GITHUB_ACTOR in authors_json else GITHUB_ACCESS_TOKEN
         except:
+            pass
+        if CAN_BOT_MAKE_PR:
             return GITHUB_ACCESS_TOKEN
+        else
+            self.error_handler("Bots cannot make PR")
 
 class IssueMock:
     number = 0
