@@ -123,7 +123,7 @@ class SubmitPullRequest():
             pass
         if CAN_BOT_MAKE_PR:
             return GITHUB_ACCESS_TOKEN
-        else
+        else:
             self.error_handler("Bots cannot make PR")
 
 class IssueMock:
