@@ -118,7 +118,8 @@ class SubmitPullRequest():
     def get_access_token(self):
         try:
             authors_json = json.loads(AUTHORS)
-            return authors_json[GITHUB_ACTOR] if GITHUB_ACTOR in authors_json else GITHUB_ACCESS_TOKEN
+            if GITHUB_ACTOR in authors_json:
+                return authors_json[GITHUB_ACTOR]
         except:
             pass
         if CAN_BOT_MAKE_PR:
